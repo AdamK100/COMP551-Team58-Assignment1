@@ -1,13 +1,14 @@
+from dis import dis
 from typing import Callable
 import numpy as np
 
-from helpers import euclidean_distance
+from helpers import euclidean_distance, most_common_label
 
 class Model:
     def __init__(self):
         return
     
-    def fit(self, hyperparameter: int, training_data, true_labels) -> "Model":
+    def fit(self, training_data, true_labels) -> "Model":
         return
     
     def predict(self, input):
@@ -26,17 +27,32 @@ class KNN_Graph(Model):
         self.k = k
         self.dist_fn = dist_fn
 
-    def fit(self, k: int, training_data: np.array, true_labels: list[str]) -> "KNN_Graph":
+    def fit(self, training_data: np.array, true_labels: list[str]) -> "KNN_Graph":
         self.training_data = training_data
         self.true_labels = true_labels
         self.num_classes = np.max(true_labels) # TODO: Fix the way to detect number of classes
         return self
     
     def predict(self, test_data: np.array) -> list:
-        num_tests = test_data.shape[0]
-        distances = []
+        distances: list[list[float]] = []
+
+        for test_data_point in test_data:
+            test_data_point_distances: list[float] = []
+            for training_data_point in self.training_data:
+                test_data_point_distances.append([self.dist_fn(test_data_point, training_data_point[1:]), training_data_point[0]])
+            
+            test_data_point_distances.sort()
+
+            distances.append(test_data_point_distances)
         
-        print(distances)
+        distances = np.array(distances)
+        
+        predictions: list = []
+        for d in distances:
+            predictions.append(most_common_label(d[:self.k, 1]))
+        
+        return predictions
+        
         
 
 class DecisionTree(Model):
@@ -46,7 +62,7 @@ class DecisionTree(Model):
     def __init__(self, max_depth: int = 1):
         self.max_depth = max_depth
 
-    def fit(self, max_depth: int, training_data: np.array, true_labels: list[str]) -> "DecisionTree":
+    def fit(self, training_data: np.array, true_labels: list[str]) -> "DecisionTree":
         return
     
     def predict(self, input: np.array) -> list:
