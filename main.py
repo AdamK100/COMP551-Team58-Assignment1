@@ -1,7 +1,4 @@
-from turtle import clear
-import numpy as np
 from helpers import evaluate_acc
-
 import models
 import inputs
 
