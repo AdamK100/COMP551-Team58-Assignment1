@@ -1,3 +1,4 @@
+from turtle import clear
 import numpy as np
 from helpers import evaluate_acc
 
@@ -22,3 +23,9 @@ print(f'Hepaptitis KNN accuracy: {accuracy}')
 # accuracy = evaluate_acc(inputs.diabetes_clean_data[551:, 0], predictions)
 
 # print(f'Diabetes KNN accuracy: {accuracy}')
+
+dt = models.DecisionTree(3)
+dt.fit(inputs.diabetes_clean_data[:576, :19], inputs.diabetes_clean_data[:576, 19])
+dt_predictions = dt.predict(inputs.diabetes_clean_data[576:, :19])
+dt_accuracy = evaluate_acc(inputs.diabetes_clean_data[576:, 19] , dt_predictions)
+print('Diabetes Decision Tree accuracy: ' + str(dt_accuracy))

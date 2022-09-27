@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 def is_clean(line: str) -> bool:
     for data_entry in line.split(","):
@@ -9,7 +10,7 @@ def is_clean(line: str) -> bool:
 
 
 # Import hepatitis data
-__hepatitis_data = open("./data/hepatitis.data")
+__hepatitis_data = open(os.path.dirname(os.path.abspath(__file__)) + "/data/hepatitis.data")
 
 hepatitis_clean_data: list[str] = []
 
@@ -28,7 +29,7 @@ __hepatitis_data.close()
 
 
 # Import diabetes data
-__diabetes_data = open("./data/messidor_features.arff")
+__diabetes_data = open(os.path.dirname(os.path.abspath(__file__)) + "/data/messidor_features.arff")
 
 diabetes_clean_data: list[str] = []
 

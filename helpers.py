@@ -31,3 +31,10 @@ def most_common_label(l: list):
 
 def evaluate_acc(true_labels: list, target_labels: list) -> float:
     return np.sum(true_labels == target_labels) / len(true_labels)
+
+def gini_index(lbls):
+    cprobs = np.bincount(lbls.astype(int)) / len(lbls)
+    gini = 0
+    for p in cprobs:
+        gini += (p * (1-p))
+    return gini
