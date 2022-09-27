@@ -17,12 +17,9 @@ hepatitis_clean_data: list[str] = []
 for __line in __hepatitis_data.readlines():
     __line = __line.strip('\n')
     if(is_clean(__line)):
-        __new_line: list[float] = []
-        for __data_point in __line.split(','):
-            __new_line.append(float(__data_point))
-        hepatitis_clean_data.append(__new_line)
+        hepatitis_clean_data.append(__line.split(','))
 
-hepatitis_clean_data = np.array(hepatitis_clean_data)
+hepatitis_clean_data = np.array(hepatitis_clean_data, float)
 
 __hepatitis_data.close()
 
@@ -37,14 +34,11 @@ __read: bool = False
 for __line in __diabetes_data.readlines():
     __line = __line.strip('\n')
     if __read and is_clean(__line):
-        __new_line: list[float] = []
-        for __data_point in __line.split(','):
-            __new_line.append(float(__data_point))
-        diabetes_clean_data.append(__new_line)
+        diabetes_clean_data.append(__line.split(','))
 
     else:
         __read = __line == "@data"
 
-diabetes_clean_data = np.array(diabetes_clean_data)
+diabetes_clean_data = np.array(diabetes_clean_data, float)
 
 __diabetes_data.close()
