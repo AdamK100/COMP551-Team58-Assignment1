@@ -1,4 +1,5 @@
-from helpers import evaluate_acc
+import numpy as np
+from helpers import cosine_similarity, evaluate_acc
 import models
 import inputs
 
@@ -21,7 +22,8 @@ print(f'Hepaptitis KNN accuracy: {accuracy}')
 
 # print(f'Diabetes KNN accuracy: {accuracy}')
 
-dt = models.DecisionTree(3)
+dt = models.DecisionTree(6)
+np.random.shuffle(inputs.diabetes_clean_data)
 dt.fit(inputs.diabetes_clean_data[:576, :19], inputs.diabetes_clean_data[:576, 19])
 dt_predictions = dt.predict(inputs.diabetes_clean_data[576:, :19])
 dt_accuracy = evaluate_acc(inputs.diabetes_clean_data[576:, 19] , dt_predictions)
