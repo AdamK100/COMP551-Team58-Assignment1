@@ -3,15 +3,21 @@ from helpers import cosine_similarity, evaluate_acc
 import models
 import inputs
 
+np.random.shuffle(inputs.hepatitis_clean_data)
+
 knn = models.KNN_Graph()
 
-knn.fit(inputs.hepatitis_clean_data[:40], inputs.hepatitis_clean_data[:40, 0])
-predictions = knn.predict(inputs.hepatitis_clean_data[41:, 1:])
+#Using 50% training, 25% validation, 25% testing.
 
-accuracy = evaluate_acc(inputs.hepatitis_clean_data[41:, 0], predictions)
+knn.fit(inputs.hepatitis_clean_data[:40], inputs.hepatitis_clean_data[:40, 0]) 
+#validate_k takes as input the validation data, validation true labels, and the maximum value of k to test.
+knn.validate_k(inputs.hepatitis_clean_data[41:61, 1:],inputs.hepatitis_clean_data[41:61, 0], 8)
+print("Chosen K: " + str(knn.k))
+predictions = knn.predict(inputs.hepatitis_clean_data[61:, 1:])
 
-print(f'Hepaptitis KNN accuracy: {accuracy}')
+accuracy = evaluate_acc(inputs.hepatitis_clean_data[61:, 0], predictions)
 
+print(f'Hepatitis KNN accuracy: {accuracy}')
 
 # knn = models.KNN_Graph()
 
@@ -31,8 +37,9 @@ dt_testing_data = inputs.diabetes_clean_data[806:, :19]
 dt_testing_labels = inputs.diabetes_clean_data[806:, 19]
 
 dt = models.DecisionTree()
-dt.validate_depth(dt_training_data, dt_training_labels, dt_validation_data, dt_validation_labels)
+dt.validate_depth(dt_training_data, dt_training_labels, dt_validation_data, dt_validation_labels, 8)
 print("Tree depth: " + str(dt.max_depth))
+dt.fit(dt_training_data, dt_training_labels)
 dt_predictions = dt.predict(dt_testing_data)
 dt_accuracy = evaluate_acc(dt_testing_labels , dt_predictions)
 print('Diabetes Decision Tree accuracy: ' + str(dt_accuracy))

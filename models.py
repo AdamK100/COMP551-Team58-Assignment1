@@ -51,6 +51,15 @@ class KNN_Graph(Model):
             predictions.append(most_common_label(d[:self.k, 1]))
         
         return predictions
+    def validate_k(self, validation_data, validation_labels, max_k) -> "KNN_Graph":
+        accuracies = []
+        for k in range(1,max_k):
+            self.k = k
+            predictions = self.predict(validation_data)
+            accuracies.append(evaluate_acc(validation_labels,predictions))
+        self.k = np.argmax(accuracies) + 1
+        return self
+
         
 class Node:
     depth: int
@@ -130,25 +139,25 @@ class DecisionTree(Model):
     def predict(self, input: np.ndarray) -> list:
         predictions = []
         for i in range(input.shape[0]):
-            predictions.append(self._classify(input[i] , self.root))
+            predictions.append(self._classify(input[i] , self.root, 0))
         return predictions
 
-    def _classify(self, point, node):
-        if(node.threshold != None and node.feature != None):
+    def _classify(self, point, node, depth):
+        if(node.threshold != None and node.feature != None and depth < self.max_depth):
             if(point[node.feature] <= node.threshold):
-                return self._classify(point, node.left)
+                return self._classify(point, node.left, depth+1)
             else:
-                return self._classify(point, node.right)
+                return self._classify(point, node.right, depth+1)
         else:
             return most_common_label(node.labels[node.data_indices])
 
-    def validate_depth(self, input:np.ndarray, labels, validation_input, validation_labels) -> "DecisionTree":
+    def validate_depth(self, input:np.ndarray, labels, validation_input, validation_labels, maxparam : int) -> "DecisionTree":
         accuracies = []
-        for d in range(1,8):
-            self.max_depth = d
-            self.fit(input,labels)
-            predictions = self.predict(validation_input)
-            accuracies.append(evaluate_acc(predictions,validation_labels))
-        self.max_depth = np.argmax(accuracies) + 1
+        self.max_depth = maxparam
         self.fit(input,labels)
+        for d in range(1,maxparam):
+            self.max_depth = d
+            predictions = self.predict(validation_input)
+            accuracies.append(evaluate_acc(validation_labels,predictions))
+        self.max_depth = np.argmax(accuracies) + 1
         return self
