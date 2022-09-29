@@ -25,15 +25,15 @@ print(f'Hepaptitis KNN accuracy: {accuracy}')
 np.random.shuffle(inputs.diabetes_clean_data)
 dt_training_data = inputs.diabetes_clean_data[:576, :19]
 dt_training_labels = inputs.diabetes_clean_data[:576, 19]
-dt_validation_input = inputs.diabetes_clean_data[576:806, :19]
+dt_validation_data = inputs.diabetes_clean_data[576:806, :19]
 dt_validation_labels = inputs.diabetes_clean_data[576:806, 19]
-dt_testing_input = inputs.diabetes_clean_data[806:, :19]
+dt_testing_data = inputs.diabetes_clean_data[806:, :19]
 dt_testing_labels = inputs.diabetes_clean_data[806:, 19]
 
 dt = models.DecisionTree()
-dt.validate_depth(dt_training_data, dt_training_labels, dt_validation_input, dt_validation_labels)
-
-dt_predictions = dt.predict(dt_testing_input)
+dt.validate_depth(dt_training_data, dt_training_labels, dt_validation_data, dt_validation_labels)
+print("Tree depth: " + str(dt.max_depth))
+dt_predictions = dt.predict(dt_testing_data)
 dt_accuracy = evaluate_acc(dt_testing_labels , dt_predictions)
 print('Diabetes Decision Tree accuracy: ' + str(dt_accuracy))
 
