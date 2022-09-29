@@ -22,9 +22,23 @@ print(f'Hepaptitis KNN accuracy: {accuracy}')
 
 # print(f'Diabetes KNN accuracy: {accuracy}')
 
-dt = models.DecisionTree(6)
 np.random.shuffle(inputs.diabetes_clean_data)
-dt.fit(inputs.diabetes_clean_data[:576, :19], inputs.diabetes_clean_data[:576, 19])
-dt_predictions = dt.predict(inputs.diabetes_clean_data[576:, :19])
-dt_accuracy = evaluate_acc(inputs.diabetes_clean_data[576:, 19] , dt_predictions)
+dt_training_data = inputs.diabetes_clean_data[:576, :19]
+dt_training_labels = inputs.diabetes_clean_data[:576, 19]
+dt_validation_input = inputs.diabetes_clean_data[576:806, :19]
+dt_validation_labels = inputs.diabetes_clean_data[576:806, 19]
+dt_testing_input = inputs.diabetes_clean_data[806:, :19]
+dt_testing_labels = inputs.diabetes_clean_data[806:, 19]
+
+dt = models.DecisionTree()
+dt.validate_depth(dt_training_data, dt_training_labels, dt_validation_input, dt_validation_labels)
+
+dt_predictions = dt.predict(dt_testing_input)
+dt_accuracy = evaluate_acc(dt_testing_labels , dt_predictions)
 print('Diabetes Decision Tree accuracy: ' + str(dt_accuracy))
+
+#similarities = []
+#for i in range(19):
+#similarities.append(cosine_similarity(inputs.diabetes_clean_data[:,i],inputs.diabetes_clean_data[:,19]))
+#print(similarities)
+#print(np.mean(similarities))

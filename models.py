@@ -1,7 +1,7 @@
 from typing import Callable
 import numpy as np
 
-from helpers import euclidean_distance, most_common_label, gini_index
+from helpers import euclidean_distance, evaluate_acc, most_common_label, gini_index
 
 class Model:
     def __init__(self):
@@ -141,3 +141,14 @@ class DecisionTree(Model):
                 return self._classify(point, node.right)
         else:
             return most_common_label(node.labels[node.data_indices])
+
+    def validate_depth(self, input:np.ndarray, labels, validation_input, validation_labels) -> "DecisionTree":
+        accuracies = []
+        for d in range(1,8):
+            self.max_depth = d
+            self.fit(input,labels)
+            predictions = self.predict(validation_input)
+            accuracies.append(evaluate_acc(predictions,validation_labels))
+        self.max_depth = np.argmax(accuracies) + 1
+        self.fit(input,labels)
+        return self
