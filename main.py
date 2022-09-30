@@ -1,5 +1,5 @@
 import numpy as np
-from helpers import cosine_similarity, evaluate_acc
+from helpers import cosine_similarity, evaluate_acc, remove_irrelevant_features
 import models
 import inputs
 
@@ -29,12 +29,16 @@ print(f'Hepatitis KNN accuracy: {accuracy}')
 # print(f'Diabetes KNN accuracy: {accuracy}')
 
 np.random.shuffle(inputs.diabetes_clean_data)
-dt_training_data = inputs.diabetes_clean_data[:576, :19]
-dt_training_labels = inputs.diabetes_clean_data[:576, 19]
-dt_validation_data = inputs.diabetes_clean_data[576:806, :19]
-dt_validation_labels = inputs.diabetes_clean_data[576:806, 19]
-dt_testing_data = inputs.diabetes_clean_data[806:, :19]
-dt_testing_labels = inputs.diabetes_clean_data[806:, 19]
+
+true_labels = inputs.diabetes_clean_data[:, -1]
+processed_data = remove_irrelevant_features(inputs.diabetes_clean_data[:,:-1], true_labels, 4)
+
+dt_training_data = processed_data[:576, :]
+dt_training_labels = true_labels[:576]
+dt_validation_data = processed_data[576:806, :]
+dt_validation_labels = true_labels[576:806]
+dt_testing_data = processed_data[806:, :]
+dt_testing_labels = true_labels[806:]
 
 dt = models.DecisionTree()
 dt.validate_depth(dt_training_data, dt_training_labels, dt_validation_data, dt_validation_labels, 8)
@@ -45,7 +49,6 @@ dt_accuracy = evaluate_acc(dt_testing_labels , dt_predictions)
 print('Diabetes Decision Tree accuracy: ' + str(dt_accuracy))
 
 #similarities = []
-#for i in range(19):
-#similarities.append(cosine_similarity(inputs.diabetes_clean_data[:,i],inputs.diabetes_clean_data[:,19]))
+#for i in range(processed_data.shape[1]):
+    #similarities.append(cosine_similarity(processed_data[:,i],true_labels))
 #print(similarities)
-#print(np.mean(similarities))
