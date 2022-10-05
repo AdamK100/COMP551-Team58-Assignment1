@@ -2,6 +2,7 @@ import numpy as np
 from helpers import cosine_similarity, evaluate_acc, remove_irrelevant_features
 import models
 import inputs
+from plots import plot
 
 np.random.shuffle(inputs.hepatitis_clean_data)
 
@@ -11,11 +12,13 @@ knn = models.KNN_Graph()
 
 knn.fit(inputs.hepatitis_clean_data[:40], inputs.hepatitis_clean_data[:40, 0]) 
 #validate_k takes as input the validation data, validation true labels, and the maximum value of k to test.
-knn.validate_k(inputs.hepatitis_clean_data[41:61, 1:],inputs.hepatitis_clean_data[41:61, 0], 8)
+knn.validate_k(inputs.hepatitis_clean_data[41:61, 1:],inputs.hepatitis_clean_data[41:61, 0], 15)
 print("Chosen K: " + str(knn.k))
 predictions = knn.predict(inputs.hepatitis_clean_data[61:, 1:])
 
 accuracy = evaluate_acc(inputs.hepatitis_clean_data[61:, 0], predictions)
+
+plot(range(1, 15), knn.k_trial(inputs.hepatitis_clean_data[41:61, 1:],inputs.hepatitis_clean_data[41:61, 0], 15), "K")
 
 print(f'Hepatitis KNN accuracy: {accuracy}')
 
