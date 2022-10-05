@@ -1,62 +1,69 @@
+from cgi import test
 from typing import Callable
 import numpy as np
 
 from helpers import euclidean_distance, evaluate_acc, most_common_label, gini_index
 
 class Model:
-    def __init__(self):
-        return
+    def __init__(self, hyperparameter):
+        pass
     
     def fit(self, training_data, true_labels) -> "Model":
-        return
+        pass
     
     def predict(self, input):
-        return
+        pass
 
 
 class KNN_Graph(Model):
 
     k: int
     dist_fn: Callable[[list[float], list[float]], float]
-    training_data: np.array
+    training_data: np.ndarray
     true_labels: list[str]
-    num_classes: int
 
     def __init__(self, k: int = 1, dist_fn: Callable[[list[float], list[float]], float] = euclidean_distance):
+        self.distances_valid = False
         self.k = k
         self.dist_fn = dist_fn
 
-    def fit(self, training_data: np.array, true_labels: list[str]) -> "KNN_Graph":
+
+    def fit(self, training_data: np.ndarray, true_labels: list[str]) -> "KNN_Graph":
+        self.distances_valid = False
         self.training_data = training_data
         self.true_labels = true_labels
-        self.num_classes = np.max(true_labels) # TODO: Fix the way to detect number of classes
         return self
     
-    def predict(self, test_data: np.array) -> list:
-        distances: list[list[float]] = []
 
-        for test_data_point in test_data:
-            test_data_point_distances: list[float] = []
-            for training_data_point in self.training_data:
-                test_data_point_distances.append([self.dist_fn(test_data_point, training_data_point[1:]), training_data_point[0]])
-            
-            test_data_point_distances.sort()
+    def compute_distances_single_point(self, test_data_point):
+        distances = np.apply_along_axis(lambda tdp: [self.dist_fn(test_data_point, tdp[1:]), tdp[0]], 1, self.training_data)
+        distances = distances[distances[:, 0].argsort()] # Sort based row by first column
+        return distances
 
-            distances.append(test_data_point_distances)
-        
-        distances = np.array(distances)
-        
-        predictions: list = []
-        for d in distances:
-            predictions.append(most_common_label(d[:self.k, 1]))
-        
-        return predictions
-    def validate_k(self, validation_data, validation_labels, max_k) -> "KNN_Graph":
+
+    def compute_distances(self, test_data) -> np.ndarray:
+        return np.apply_along_axis(self.compute_distances_single_point, 1, test_data)
+    
+
+    def predict(self, test_data: np.ndarray) -> list:
+        distances = self.compute_distances(test_data)
+        return [most_common_label(d[:self.k, 1]) for d in distances]
+    
+
+    def k_trial(self, validation_data, validation_labels, max_k: int) -> np.ndarray:
+        distances = self.compute_distances(validation_data)
+
         accuracies = []
-        for k in range(1,max_k):
+        for k in range(1, max_k):
             self.k = k
-            predictions = self.predict(validation_data)
+            predictions = [most_common_label(d[:k, 1]) for d in distances]
             accuracies.append(evaluate_acc(validation_labels,predictions))
+
+        return np.array(accuracies)
+        
+
+    def validate_k(self, validation_data, validation_labels, max_k) -> "KNN_Graph":
+        accuracies = self.k_trial(validation_data, validation_labels, max_k)
         self.k = np.argmax(accuracies) + 1
         return self
 
@@ -111,7 +118,7 @@ class DecisionTree(Model):
                         best_threshold = t
             return best_cost, best_feature, best_threshold
 
-    def fit(self, training_data: np.array, true_labels: list[str]) -> "DecisionTree":
+    def fit(self, training_data: np.ndarray, true_labels: list[str]) -> "DecisionTree":
         root = Node(np.arange(len(training_data)), None)
         root.labels = true_labels
         root.data = training_data
