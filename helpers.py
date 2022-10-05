@@ -20,7 +20,8 @@ def gini_index(labels):
 def cosine_similarity(vector1,vector2):
     return np.sum(vector1 * vector2)/(sqrt(np.sum(vector1 ** 2)) * sqrt(np.sum(vector2 ** 2)))
 
-def remove_irrelevant_features(data : np.ndarray, true_labels : np.array, nb_features : int) -> np.ndarray:
+def remove_irrelevant_features(data : np.ndarray, true_labels : np.ndarray, nb_features : int) -> np.ndarray:
+    # similarities = np.apply_along_axis(lambda d: cosine_similarity(d, true_labels), 0, data)
     similarities = []
     for i in range(data.shape[1]):
         similarities.append(cosine_similarity(data[:,i],true_labels))
