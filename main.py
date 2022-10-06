@@ -46,6 +46,9 @@ dt_testing_labels = true_labels[806:]
 dt = models.DecisionTree()
 dt.validate_depth(dt_training_data, dt_training_labels, dt_validation_data, dt_validation_labels, 8)
 print("Tree depth: " + str(dt.max_depth))
+
+plot(range(1, 8), dt.max_depth_trial(dt_training_data, dt_training_labels, dt_validation_data, dt_validation_labels, 8), "Max depth")
+
 dt.fit(dt_training_data, dt_training_labels)
 dt_predictions = dt.predict(dt_testing_data)
 dt_accuracy = evaluate_acc(dt_testing_labels , dt_predictions)

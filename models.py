@@ -5,13 +5,14 @@ import numpy as np
 from helpers import euclidean_distance, evaluate_acc, most_common_label, gini_index
 
 class Model:
-    def __init__(self, hyperparameter):
+    
+    def __init__(self, hyperparameter: int):
         pass
     
     def fit(self, training_data, true_labels) -> "Model":
         pass
     
-    def predict(self, input):
+    def predict(self, input) -> list:
         pass
 
 
@@ -69,14 +70,16 @@ class KNN_Graph(Model):
 
         
 class Node:
+
     depth: int
     feature : int
     threshold : float
+    
     def __init__(self, data_indices, parent):
-        self.data_indices = data_indices                   #stores the data indices which are in the region defined by this node
-        self.left = None                                    #stores the left child of the node 
-        self.right = None                                   #stores the right child of the node
-        self.feature = None                           #the feature for split at this node
+        self.data_indices = data_indices
+        self.left = None
+        self.right = None
+        self.feature = None
         self.threshold = None
         self.depth = 0
         if parent:
@@ -93,30 +96,32 @@ class DecisionTree(Model):
 
     def __init__(self, max_depth: int = 1):
         self.max_depth = max_depth
-        self.root = None  
+        self.root = None
+
 
     def greedy_split(self, node):
-            best_feature, best_threshold = None, None
-            best_cost = np.inf
-            nb_points , nb_features = node.data.shape
-            sorted_data = np.sort(node.data[node.data_indices], axis=0)
-            thresholds = test_candidates = (sorted_data[1:] + sorted_data[:-1]) / 2.
-            for i in range(nb_features):
-                feature_data = node.data[node.data_indices, i]
-                for t in thresholds[:,i]:
-                    left_indices = node.data_indices[feature_data <= t]
-                    right_indices = node.data_indices[feature_data > t]
-                    if len(left_indices) == 0 or len(right_indices) == 0:                
-                        continue                                                      
-                    left_cost = gini_index(node.labels[left_indices])
-                    right_cost = gini_index(node.labels[right_indices])
-                    num_left, num_right = left_indices.shape[0], right_indices.shape[0]
-                    cost = (num_left * left_cost + num_right * right_cost)/nb_points
-                    if cost < best_cost:
-                        best_cost = cost
-                        best_feature = i
-                        best_threshold = t
-            return best_cost, best_feature, best_threshold
+        best_feature, best_threshold = None, None
+        best_cost = np.inf
+        nb_points, nb_features = node.data.shape
+        sorted_data = np.sort(node.data[node.data_indices], axis=0)
+        thresholds = test_candidates = (sorted_data[1:] + sorted_data[:-1]) / 2.
+        for i in range(nb_features):
+            feature_data = node.data[node.data_indices, i]
+            for t in thresholds[:,i]:
+                left_indices = node.data_indices[feature_data <= t]
+                right_indices = node.data_indices[feature_data > t]
+                if len(left_indices) == 0 or len(right_indices) == 0:
+                    continue
+                left_cost = gini_index(node.labels[left_indices])
+                right_cost = gini_index(node.labels[right_indices])
+                num_left, num_right = left_indices.shape[0], right_indices.shape[0]
+                cost = (num_left * left_cost + num_right * right_cost) / nb_points
+                if cost < best_cost:
+                    best_cost = cost
+                    best_feature = i
+                    best_threshold = t
+        return best_cost, best_feature, best_threshold
+
 
     def fit(self, training_data: np.ndarray, true_labels: list[str]) -> "DecisionTree":
         root = Node(np.arange(len(training_data)), None)
@@ -126,6 +131,7 @@ class DecisionTree(Model):
         self._fit_tree(self.root)
         return self
     
+
     def _fit_tree(self, node):
         if node.depth == self.max_depth or len(node.data_indices) <= 1:
             return
@@ -146,8 +152,9 @@ class DecisionTree(Model):
     def predict(self, input: np.ndarray) -> list:
         predictions = []
         for i in range(input.shape[0]):
-            predictions.append(self._classify(input[i] , self.root, 0))
+            predictions.append(self._classify(input[i], self.root, 0))
         return predictions
+
 
     def _classify(self, point, node, depth):
         if(node.threshold != None and node.feature != None and depth < self.max_depth):
@@ -158,13 +165,20 @@ class DecisionTree(Model):
         else:
             return most_common_label(node.labels[node.data_indices])
 
-    def validate_depth(self, input:np.ndarray, labels, validation_input, validation_labels, maxparam : int) -> "DecisionTree":
+
+    def max_depth_trial(self, input: np.ndarray, labels, validation_input, validation_labels, max_depth: int) -> np.ndarray:
         accuracies = []
-        self.max_depth = maxparam
-        self.fit(input,labels)
-        for d in range(1,maxparam):
+        self.max_depth = max_depth
+        self.fit(input, labels)
+        for d in range(1, max_depth):
             self.max_depth = d
             predictions = self.predict(validation_input)
-            accuracies.append(evaluate_acc(validation_labels,predictions))
+            accuracies.append(evaluate_acc(validation_labels, predictions))
+        
+        return np.array(accuracies)
+
+
+    def validate_depth(self, input: np.ndarray, labels, validation_input, validation_labels, max_depth: int) -> "DecisionTree":
+        accuracies = self.max_depth_trial(input, labels, validation_input, validation_labels, max_depth)
         self.max_depth = np.argmax(accuracies) + 1
         return self
