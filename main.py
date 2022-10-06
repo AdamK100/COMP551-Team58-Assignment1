@@ -1,5 +1,5 @@
 import numpy as np
-from helpers import cosine_similarity, evaluate_acc, remove_irrelevant_features
+from helpers import evaluate_acc, remove_irrelevant_features
 import models
 import inputs
 from plots import plot
