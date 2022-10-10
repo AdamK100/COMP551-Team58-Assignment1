@@ -1,5 +1,5 @@
 import numpy as np
-from helpers import entropy, evaluate_acc, misclass_rate, remove_irrelevant_features
+from helpers import entropy, evaluate_acc, manhattan_distance, misclass_rate, remove_irrelevant_features
 import models
 import inputs
 from plots import plot
@@ -25,6 +25,5 @@ print('Attrib 0 distribution: \'0\' = ' + str(adistrib[0]/(float)(len(inputs.dia
 adistrib2 = np.bincount((inputs.diabetes_clean_data[:,1]).astype(int))
 print('Attrib 1 distribution: \'0\' = ' + str(adistrib2[0]/(float)(len(inputs.diabetes_clean_data[:,1]))) + ", \'1\' = " + str(adistrib2[1]/(float)(len(inputs.diabetes_clean_data[:,1]))))
 print('Attrib 2 Mean: ' + str(np.mean(inputs.diabetes_clean_data[:,2])))
-
 
 #Test 1: Accuracy of Models ()

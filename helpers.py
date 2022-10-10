@@ -5,6 +5,8 @@ from math import sqrt
 def euclidean_distance(x1: list[float], x2: list[float]) -> float:
     return np.sqrt(np.sum((np.array(x2) - np.array(x1)) ** 2))
 
+def manhattan_distance(x1: list[float], x2: list[float]) -> float:
+    return np.sum(np.abs(np.array(x2) - np.array(x1)))
 
 def most_common_label(l: list):
     return np.bincount(np.array(l, int)).argmax()
