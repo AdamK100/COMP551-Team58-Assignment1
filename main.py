@@ -1,5 +1,5 @@
 import numpy as np
-from helpers import evaluate_acc, remove_irrelevant_features
+from helpers import evaluate_acc, manhattan_distance, remove_irrelevant_features
 import models
 import inputs
 from plots import plot
@@ -18,7 +18,11 @@ predictions = knn.predict(inputs.hepatitis_clean_data[61:, 1:])
 
 accuracy = evaluate_acc(inputs.hepatitis_clean_data[61:, 0], predictions)
 
-plot(range(1, 15), knn.k_trial(inputs.hepatitis_clean_data[41:61, 1:],inputs.hepatitis_clean_data[41:61, 0], 15), "K")
+k_trial_euclidean = knn.k_trial(inputs.hepatitis_clean_data[41:61, 1:],inputs.hepatitis_clean_data[41:61, 0], 15)
+knn.dist_fn = manhattan_distance
+k_trial_manhattan = knn.k_trial(inputs.hepatitis_clean_data[41:61, 1:],inputs.hepatitis_clean_data[41:61, 0], 15)
+
+plot(range(1, 15), [k_trial_euclidean, k_trial_manhattan], "K", ["Euclidean", "Manhattan"])
 
 print(f'Hepatitis KNN accuracy: {accuracy}')
 
