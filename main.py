@@ -1,5 +1,5 @@
 import numpy as np
-from helpers import evaluate_acc, manhattan_distance, remove_irrelevant_features
+from helpers import entropy, evaluate_acc, misclass_rate, remove_irrelevant_features, manhattan_distance
 import models
 import inputs
 from plots import plot
