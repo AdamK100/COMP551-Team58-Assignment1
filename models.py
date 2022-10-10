@@ -92,9 +92,10 @@ class DecisionTree(Model):
 
     max_depth: int
     root: Node
-
-    def __init__(self, max_depth: int = 1):
+    cost_fn: Callable[[list[float]], float]
+    def __init__(self, max_depth: int = 1, cost_fn: Callable[[list[float]], float] = gini_index):
         self.max_depth = max_depth
+        self.cost_fn = cost_fn
         self.root = None
 
 
@@ -111,8 +112,8 @@ class DecisionTree(Model):
                 right_indices = node.data_indices[feature_data > t]
                 if len(left_indices) == 0 or len(right_indices) == 0:
                     continue
-                left_cost = gini_index(node.labels[left_indices])
-                right_cost = gini_index(node.labels[right_indices])
+                left_cost = self.cost_fn(node.labels[left_indices])
+                right_cost = self.cost_fn(node.labels[right_indices])
                 num_left, num_right = left_indices.shape[0], right_indices.shape[0]
                 cost = (num_left * left_cost + num_right * right_cost) / nb_points
                 if cost < best_cost:
