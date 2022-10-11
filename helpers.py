@@ -44,10 +44,15 @@ def cosine_similarity(vector1,vector2):
     return np.sum(vector1 * vector2)/(sqrt(np.sum(vector1 ** 2)) * sqrt(np.sum(vector2 ** 2)))
 
 
-def remove_irrelevant_features(data : np.ndarray, true_labels : np.ndarray, nb_features : int) -> np.ndarray:
-    # similarities = np.apply_along_axis(lambda d: cosine_similarity(d, true_labels), 0, data)
+def features_by_relevance(data: np.ndarray, true_labels: np.ndarray) -> np.ndarray:
     similarities = []
     for i in range(data.shape[1]):
         similarities.append(cosine_similarity(data[:,i],true_labels))
+    return np.array(similarities)
+
+
+def remove_irrelevant_features(data : np.ndarray, true_labels : np.ndarray, nb_features : int) -> np.ndarray:
+    # similarities = np.apply_along_axis(lambda d: cosine_similarity(d, true_labels), 0, data)
+    similarities = features_by_relevance(data, true_labels)
     min_similarities = np.argpartition(similarities,nb_features)
     return np.delete(data, min_similarities[:nb_features], 1)
